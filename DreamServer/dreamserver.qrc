@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/Icons/menu.png</file>
+        <file>Resources/Icons/stop.png</file>
+        <file>Resources/Icons/apply.png</file>
+        <file>Resources/Icons/add_8214.png</file>
+        <file>Resources/Icons/start.png</file>
+        <file>Resources/Icons/DefaultCourse.png</file>
+        <file>Resources/Icons/Close.png</file>
+        <file>Resources/Icons/net.png</file>
+        <file>MainSheet.css</file>
+        <file>Resources/Icons/DreamIcon.png</file>
+        <file>Resources/Icons/icon.jpg</file>
+    </qresource>
+</RCC>

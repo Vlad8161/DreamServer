@@ -1,0 +1,48 @@
+TableWidget {
+	background: rgb(130, 130, 130);
+}
+
+TableWidget QPushButton {
+	background: rgb(103, 184, 255);
+	color: white;
+	border: 1px solid rgb(145, 145, 145);
+	min-height: 20px;
+	max-height: 20px;
+}
+
+TableWidget QPushButton:hover {
+	background: rgb(114, 175, 240);
+}
+
+TableWidget QListView {
+	background: rgb(182, 182, 182)
+}
+
+TableWidget QLabel {
+	padding-left: 7px;
+	min-height: 20px;
+	color: white;
+}
+
+QTableView {
+    color: rgb(2, 107, 174);
+}
+
+ClosedTableWidget {
+    background-color: rgba(50, 50, 50, 200);
+    border-radius: 5px;
+}
+
+ClosedTableWidget QPushButton {
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(255, 255, 255);
+}
+
+ClosedTableWidget QPushButton:hover {
+    background-color: rgb(114, 175, 240);
+    color: rgb(255, 255, 255);
+    border-color: rgb(255, 255, 255);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+}

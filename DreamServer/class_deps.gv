@@ -1,0 +1,58 @@
+digraph G {
+    graph [overlap=false];
+    node [overlap=false];
+    edge [overlap=false];
+
+    ServerSolution->OrdersRepo;
+    ServerSolution->MenuWidget;
+    ServerSolution->NetworkWidget;
+    ServerSolution->OrdersRepoView;
+    ServerSolution->ClosedTableWidget;
+
+    MenuWidget->MenuDatabaseModel;
+    MenuDatabaseModel->MenuDatabase;
+
+    NetworkWidget->NetworkManager;
+    NetworkWidget->NetworkConnectionModel;
+    NetworkConnectionModel->NetworkManager [style="dashed"];
+    NetworkManager->NetworkResponser;
+    NetworkManager->OrdersRepo [style="dashed"];
+    NetworkManager->MenuDatabaseModel [style="dashed"];
+
+    OrdersRepoView->OrdersRepoModel;
+    OrdersRepoModel->OrdersRepo [style="dashed"];
+    OrdersRepo->OrdersDatabase;
+    OrdersRepo->MenuDatabaseModel [style="dashed"];
+
+    subgraph cluster0 {
+        graph [overlap=false];
+        node [overlap=false];
+        edge [overlap=false];
+
+        MenuWidget;
+        MenuDatabaseModel;
+        MenuDatabase;
+    }
+
+    subgraph cluster1 {
+        graph [overlap=false];
+        node [overlap=false];
+        edge [overlap=false];
+
+        OrdersRepo;
+        OrdersDatabase;
+        OrdersRepoModel;
+        OrdersRepoView;
+    }
+
+    subgraph cluster3 {
+        graph [overlap=false];
+        node [overlap=false];
+        edge [overlap=false];
+
+        NetworkWidget;
+        NetworkConnectionModel;
+        NetworkManager;
+        NetworkResponser;
+    }
+}
