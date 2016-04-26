@@ -1,4 +1,5 @@
 #include "include/widgets/MenuWidget.h"
+#include "include/MenuItemDelegate.h"
 #include <qsqlquery.h>
 #include <qsqlrecord.h>
 #include <qmenu.h>
@@ -14,6 +15,7 @@ MenuWidget::MenuWidget(MenuDatabaseModel* menu, QWidget *parent)
 
 	m_menu = menu;
 	ui.tree_view->setModel(m_menu);
+	ui.tree_view->setItemDelegate(new MenuItemDelegate(ui.tree_view));
 	ui.tree_view->setSelectionMode(QAbstractItemView::SingleSelection);
 	ui.tree_view->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui.tree_view->setContextMenuPolicy(Qt::CustomContextMenu);
