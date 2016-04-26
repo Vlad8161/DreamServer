@@ -57,6 +57,10 @@ void NetworkWidget::on_action_server_start()
 			.arg(address.toString())
 			.arg(m_mgr->port()));
 	}
+	else {
+		m_action_server_start->setChecked(false);
+		m_action_server_stop->setChecked(true);
+	}
 }
 
 

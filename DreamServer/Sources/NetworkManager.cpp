@@ -45,7 +45,7 @@ bool NetworkManager::start()
 	if (m_tcp_server->isListening())
 		return true;
 
-	if (!m_tcp_server->listen(QHostAddress("192.168.0.29"), m_port))
+	if (!m_tcp_server->listen(QHostAddress::Any, m_port))
 		return false;
 
 	emit server_started();
