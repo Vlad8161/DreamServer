@@ -252,6 +252,15 @@ void NetworkResponser::m_handle_make_order_request(const QJsonObject& root)
 
 
 
+void NetworkResponser::check_connection()
+{
+	QJsonObject root;
+	root["response_code"] = ResponseCodes::CheckConnection;
+	m_send_response(root);
+}
+
+
+
 // Это основной метод, формирующий пакет данных для передачи
 void NetworkResponser::m_send_response(const QJsonObject& root, const QByteArray& appendix)
 {

@@ -8,7 +8,7 @@ class TreeNode {
 public:
 	~TreeNode() {
 		for (auto& i : children) {
-			delete i->data;
+			//delete i->data;
 			delete i;
 		}
 		delete data;

@@ -26,7 +26,8 @@ enum ResponseCodes {
 	ErrorInvalidHash = 7,
 	ErrorInvalidCourseId = 8,
 	ErrorAccessDeniedAuth = 9,
-	ErrorAccessDeniedSync = 10
+	ErrorAccessDeniedSync = 10,
+	CheckConnection = 11
 };
 
 
@@ -52,6 +53,7 @@ public:
 		QString* cached_menu, QString* cached_hash);
 	~NetworkResponser();
 	const QString& name() const { return m_name; }
+	void check_connection();
 
 public slots:
 	// слот, обрабатывающий соответствующий 

@@ -9,6 +9,7 @@
 class MenuDatabaseModel;
 class OrdersRepo;
 class NetworkConnectionsModel;
+class QTimer;
 
 /* Manages incoming connections
  * Creates NetworkResponser for each connection
@@ -33,9 +34,11 @@ public:
 
 private slots:
 	void on_connect();
+	//void on_socket_error();
 	void on_disconnect();
 	void on_menu_changed();
 	void on_responser_status_changed();
+	void on_tick();
 
 private:
 	void m_clear_clients_list();
@@ -52,6 +55,7 @@ private:
 	QTcpServer* m_tcp_server;
 	OrdersRepo* m_repo;
 	MenuDatabaseModel* m_menu;
+	QTimer* m_timer;
 	QString m_cached_menu;
 	QString m_cached_hash;
 

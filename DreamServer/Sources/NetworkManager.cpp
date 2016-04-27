@@ -9,6 +9,7 @@
 #include <qjsonobject.h>
 #include <qjsondocument.h>
 #include <qcryptographichash.h>
+#include <qtimer.h>
 
 #include <assert.h>
 
@@ -18,6 +19,7 @@ NetworkManager::NetworkManager(MenuDatabaseModel* menu_model, OrdersRepo* orders
 	m_menu = menu_model;
 	m_repo = orders_repo;
 	m_tcp_server = new QTcpServer(this);
+	m_timer = new QTimer(this);
 
 	m_serialize_menu();
 
@@ -27,6 +29,10 @@ NetworkManager::NetworkManager(MenuDatabaseModel* menu_model, OrdersRepo* orders
 		this, SLOT(on_table_changed(int)));
 	connect(m_tcp_server, SIGNAL(newConnection()),
 		this, SLOT(on_connect()));
+	connect(m_timer, SIGNAL(timeout()),
+		this, SLOT(on_tick()));
+
+	m_timer->start(1000);
 }
 
 
@@ -36,6 +42,7 @@ NetworkManager::~NetworkManager()
 	if (m_tcp_server->isListening())
 		stop();
 	delete m_tcp_server;
+	delete m_timer;
 }
 
 
@@ -79,6 +86,8 @@ void NetworkManager::on_connect()
 
 	connect(new_socket, SIGNAL(disconnected()),
 		this, SLOT(on_disconnect()));
+	//connect(new_socket, SIGNAL(error(QAbstractSocket::SocketError)),
+		//this, SLOT(on_socket_error()));
 	connect(new_client, SIGNAL(status_changed()),
 		this, SLOT(on_responser_status_changed()));
 
@@ -97,6 +106,21 @@ void NetworkManager::on_disconnect()
 	m_clients.remove(socket);
 
 	emit connection_list_changed();
+}
+
+
+
+/*void NetworkManager::on_socket_error()
+{
+	QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+	socket->disconnectFromHost();
+}*/
+
+void NetworkManager::on_tick()
+{
+	for (auto& i : m_clients.values()) {
+		i->check_connection();
+	}
 }
 
 
