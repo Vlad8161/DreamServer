@@ -127,6 +127,9 @@
     <CustomBuild Include="include\OrdersRepoView.h">
       <Filter>Header Files\Orders</Filter>
     </CustomBuild>
+    <CustomBuild Include="include\MenuItemDelegate.h">
+      <Filter>Header Files\Menu</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_MenuDatabaseModel.cpp">
@@ -242,6 +245,15 @@
     </ClCompile>
     <ClCompile Include="Sources\OrdersRepoView.cpp">
       <Filter>Source Files\Orders</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MenuItemDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MenuItemDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\MenuItemDelegate.cpp">
+      <Filter>Source Files\Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

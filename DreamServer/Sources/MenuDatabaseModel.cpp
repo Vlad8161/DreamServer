@@ -121,19 +121,22 @@ void MenuDatabaseModel::remove_menu_item(const QModelIndex& index)
 	MenuItem* item = node->data;
 
 	if (item->id != -1) {
-		// category
+		// item
 		bool ok = m_menu_db.remove_menu_item(item->id);
 		assert(ok);
+		m_items.remove(item->id);
 	}
 	else {
+		// category
 		bool ok = m_menu_db.remove_category(item->name);
 		assert(ok);
+		for (auto& i : node->children)
+			m_items.remove(i->data->id);
 	}
 
 	beginResetModel();
 
 	m_tree_delete_item(node);
-	m_items.remove(item->id);
 
 	emit menu_changed();
 
@@ -210,6 +213,9 @@ bool MenuDatabaseModel::setData(const QModelIndex& index, const QVariant& value,
 		if (new_category.isEmpty() || m_does_category_exist(new_category))
 			return false;
 
+		if (new_category.contains(";") || new_category.contains("\n"))
+			return false;
+
 		bool ok = m_menu_db.rename_category(item->name, new_category);
 		assert(ok);
 
@@ -220,7 +226,11 @@ bool MenuDatabaseModel::setData(const QModelIndex& index, const QVariant& value,
 	else {
 		// элемент меню
 		QString new_name = value.toString();
+
 		if (new_name.isEmpty())
+			return false;
+
+		if (new_name.contains(";") || new_name.contains("\n"))
 			return false;
 
 		bool ok = m_menu_db.change_name(item->id, new_name);
