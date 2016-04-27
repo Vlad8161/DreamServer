@@ -196,44 +196,51 @@ void NetworkResponser::m_handle_make_order_request(const QJsonObject& root)
 		return;
 	}
 
-	if (!root.contains("orders") || !root["orders"].isArray()) {
+	if (!root.contains("orders") || !root["orders"].isString()) {
 		response["response_code"] = ResponseCodes::ErrorInvalidRequest;
 		m_send_response(response);
 		return;
 	}
 
-	QJsonArray& items = root["orders"].toArray();
+	QString str_order = root["orders"].toString();
+	QStringList str_order_items = str_order.split("\n");
 	QVector<PreOrder> pre_orders;
 
-	for (auto& i : items) {
-		if (!i.isObject()) {
+	for (auto& i : str_order_items) {
+		bool ok;
+		PreOrder o;
+		QStringList order_item_fields = i.split(";");
+
+		if (order_item_fields.size() != 4) {
 			response["response_code"] = ResponseCodes::ErrorInvalidRequest;
 			m_send_response(response);
 			return;
 		}
 
-		QJsonObject o = i.toObject();
-		if (!o.contains("id_course") ||
-			!o.contains("count") ||
-			!o.contains("table_num") ||
-			!o.contains("notes")) {
+		o.id_course = order_item_fields[0].toInt(&ok);
+		if (!ok) {
 			response["response_code"] = ResponseCodes::ErrorInvalidRequest;
 			m_send_response(response);
 			return;
 		}
 
-		PreOrder pre_o;
-		pre_o.id_course = o["id_course"].toInt();
-		pre_o.count = o["count"].toInt();
-		pre_o.t_num = o["table_num"].toInt();
-		pre_o.notes = o["notes"].toString();
-		if (!m_menu->contains(pre_o.id_course)) {
-			response["response_code"] = ResponseCodes::ErrorInvalidCourseId;
+		o.count = order_item_fields[1].toInt(&ok);
+		if (!ok) {
+			response["response_code"] = ResponseCodes::ErrorInvalidRequest;
 			m_send_response(response);
 			return;
 		}
 
-		pre_orders.push_back(pre_o);
+		o.t_num = order_item_fields[2].toInt(&ok);
+		if (!ok) {
+			response["response_code"] = ResponseCodes::ErrorInvalidRequest;
+			m_send_response(response);
+			return;
+		}
+		
+		o.notes = order_item_fields[3];
+	
+		pre_orders.push_back(o);
 	}
 
 	for (auto& i : pre_orders)
