@@ -86,8 +86,6 @@ void NetworkManager::on_connect()
 
 	connect(new_socket, SIGNAL(disconnected()),
 		this, SLOT(on_disconnect()));
-	//connect(new_socket, SIGNAL(error(QAbstractSocket::SocketError)),
-		//this, SLOT(on_socket_error()));
 	connect(new_client, SIGNAL(status_changed()),
 		this, SLOT(on_responser_status_changed()));
 
@@ -110,16 +108,10 @@ void NetworkManager::on_disconnect()
 
 
 
-/*void NetworkManager::on_socket_error()
-{
-	QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
-	socket->disconnectFromHost();
-}*/
-
 void NetworkManager::on_tick()
 {
 	for (auto& i : m_clients.values()) {
-		i->check_connection();
+		i->increment_ticks();
 	}
 }
 

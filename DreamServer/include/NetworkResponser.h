@@ -13,7 +13,8 @@ enum ActionCodes {
 	Authorize = 1,
 	CheckSync = 2,
 	RequestMenu = 3,
-	MakeOrder = 4
+	MakeOrder = 4,
+	CheckConnection = 5
 };
 
 enum ResponseCodes {
@@ -27,7 +28,7 @@ enum ResponseCodes {
 	ErrorInvalidCourseId = 8,
 	ErrorAccessDeniedAuth = 9,
 	ErrorAccessDeniedSync = 10,
-	CheckConnection = 11
+	IAmHere = 11
 };
 
 
@@ -53,7 +54,7 @@ public:
 		QString* cached_menu, QString* cached_hash);
 	~NetworkResponser();
 	const QString& name() const { return m_name; }
-	void check_connection();
+	void increment_ticks();
 
 public slots:
 	// слот, обрабатывающий соответствующий 
@@ -66,6 +67,7 @@ private:
 	void m_handle_check_sync_request(const QJsonObject& root);
 	void m_handle_menu_request(const QJsonObject& root);
 	void m_handle_make_order_request(const QJsonObject& root);
+	void m_handle_check_connection();
 	// отправка данных
 	void m_send_response(const QJsonObject& root, const QByteArray& appendix = QByteArray());
 
@@ -78,6 +80,7 @@ private:
 	qint32 m_flags;
 	QString* m_cached_menu;
 	QString* m_cached_hash;
+	quint32 m_unresponsed_ticks;
 
 signals:
 	void status_changed();

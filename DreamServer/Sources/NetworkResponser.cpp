@@ -32,6 +32,7 @@ NetworkResponser::NetworkResponser(QTcpSocket* socket, MenuDatabaseModel* menu, 
 	m_cached_menu = cached_menu;
 	m_cached_hash = cached_hash;
 	m_name = socket->peerAddress().toString();
+	m_unresponsed_ticks = 0;
 
 	connect(m_socket, SIGNAL(readyRead()),
 		this, SLOT(on_ready_read()), Qt::QueuedConnection);
@@ -93,6 +94,9 @@ void NetworkResponser::on_ready_read()
 		}
 		else if (action_code == ActionCodes::MakeOrder) {
 			m_handle_make_order_request(root);
+		}
+		else if (action_code == ActionCodes::CheckConnection) {
+			m_handle_check_connection();
 		}
 		else {
 			QJsonObject response;
@@ -252,11 +256,21 @@ void NetworkResponser::m_handle_make_order_request(const QJsonObject& root)
 
 
 
-void NetworkResponser::check_connection()
+void NetworkResponser::m_handle_check_connection()
 {
-	QJsonObject root;
-	root["response_code"] = ResponseCodes::CheckConnection;
-	m_send_response(root);
+	QJsonObject response;
+	response["response_code"] = ResponseCodes::IAmHere;
+	m_send_response(response);
+	m_unresponsed_ticks = 0;
+}
+
+
+
+void NetworkResponser::increment_ticks()
+{
+	m_unresponsed_ticks++;
+	if (m_unresponsed_ticks > 5)
+		m_socket->disconnectFromHost();
 }
 
 
