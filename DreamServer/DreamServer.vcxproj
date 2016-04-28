@@ -17,6 +17,7 @@
     <ClInclude Include="GeneratedFiles\ui_network_widget.h" />
     <ClInclude Include="include\MenuDatabase.h" />
     <ClInclude Include="include\MenuItem.h" />
+    <ClInclude Include="include\SettingsWidget.h" />
     <CustomBuild Include="include\MenuItemDelegate.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing MenuItemDelegate.h...</Message>
@@ -231,6 +232,7 @@
     <ClCompile Include="Sources\OrdersRepo.cpp" />
     <ClCompile Include="Sources\OrdersRepoModel.cpp" />
     <ClCompile Include="Sources\OrdersRepoView.cpp" />
+    <ClCompile Include="sources\SettingsWidget.cpp" />
     <ClCompile Include="Sources\Widgets\ClosedTableWidget.cpp" />
     <ClCompile Include="Sources\Widgets\DreamServer.cpp" />
     <ClCompile Include="Sources\Widgets\MenuWidget.cpp" />

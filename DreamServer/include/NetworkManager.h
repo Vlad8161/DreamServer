@@ -34,7 +34,6 @@ public:
 
 private slots:
 	void on_connect();
-	//void on_socket_error();
 	void on_disconnect();
 	void on_menu_changed();
 	void on_responser_status_changed();
