@@ -111,7 +111,7 @@ void NetworkManager::on_disconnect()
 void NetworkManager::on_tick()
 {
 	for (auto& i : m_clients.values()) {
-		i->check_connection();
+		i->increment_ticks();
 	}
 }
 
