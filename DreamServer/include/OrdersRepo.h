@@ -25,6 +25,7 @@ public:
 	void add_order(int course_id, int t_num, int count, QString notes);
 	bool set_order_status(int t_num, int row, int status);
 	bool close_table(int table_num);
+	bool is_table_served(int t_num);
 	void restore_orders(const QList<Order>& orders);
 
 	//Следующая функция возвращает модель для одного стола

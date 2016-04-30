@@ -161,18 +161,25 @@ void ServerSolution::on_tab_close_requested(int index)
 	int t_num = closing_title.section(QString::fromLocal8Bit("№"), 1, 1).toInt();
 	auto orders = m_repo->query_table_orders(t_num);
 	m_closed_table_widget->save_table_info(orders);
-	if (m_repo->close_table(t_num)) {
+
+	bool ok = m_repo->is_table_served(t_num);
+	if (!ok) {
+		if (QMessageBox::warning(this,
+			QString::fromLocal8Bit("Ошибка закрытия стола"),
+			QString::fromLocal8Bit("Невозможно закрыть стол №%1, так как он не обслужен!")
+			.arg(t_num), QMessageBox::Yes, QMessageBox::No)
+			== QMessageBox::Yes) {
+			ok = true;
+		}
+	}
+
+	if (ok) {
+		m_repo->close_table(t_num);
 		QWidget* w = m_tab_widget->widget(index);
 		m_tab_widget->removeTab(index);
 		m_opened_tables_nums.remove(t_num);
 		m_closed_table_widget->show();
 		delete w;	
-	}
-	else {
-		QMessageBox::critical(this,
-			QString::fromLocal8Bit("Ошибка закрытия стола"),
-			QString::fromLocal8Bit("Невозможно закрыть стол №%1, так как он не обслужен!")
-				.arg(t_num));
 	}
 }
 

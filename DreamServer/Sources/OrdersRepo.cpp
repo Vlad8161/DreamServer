@@ -143,6 +143,16 @@ void OrdersRepo::restore_orders(const QList<Order>& orders)
 }
 
 
+// проверяем обслуженили стол
+bool OrdersRepo::is_table_served(int t_num)
+{
+	// убеждаемся, что все заказы обслужены, иначе выходим
+	for (auto& i : m_table_orders[t_num]) {
+		if (i->status != Order::SERVED)
+			return false;
+	}
+}
+
 
 // закрываем стол
 bool OrdersRepo::close_table(int table_num)
@@ -151,12 +161,6 @@ bool OrdersRepo::close_table(int table_num)
 	if (!m_table_orders.contains(table_num) ||
 		m_table_orders[table_num].isEmpty())
 		return false;
-
-	// убеждаемся, что все заказы обслужены, иначе выходим
-	for (auto& i : m_table_orders[table_num]) {
-		if (i->status != Order::SERVED)
-			return false;
-	}
 
 	// если все таки все гуд, то поочередно удаляем заказы из репозитория, и чистим стол
 	for (auto elem : m_table_orders[table_num]) {
