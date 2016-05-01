@@ -3,6 +3,7 @@
 
 #include <qobject.h>
 #include <qjsonarray.h>
+#include <qtcpsocket.h>
 
 class QTcpSocket;
 class MenuDatabaseModel;
@@ -54,6 +55,7 @@ public:
 		QString* cached_menu, QString* cached_hash);
 	~NetworkResponser();
 	const QString& name() const { return m_name; }
+	void kick() { m_socket->disconnectFromHost(); }
 	void increment_ticks();
 
 public slots:

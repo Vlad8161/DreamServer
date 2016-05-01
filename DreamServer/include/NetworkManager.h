@@ -31,6 +31,7 @@ public:
 	int n_clients() const { return m_clients.count(); }
 	bool start();
 	void stop();
+	void kick_client_at_row(int row);
 
 private slots:
 	void on_connect();

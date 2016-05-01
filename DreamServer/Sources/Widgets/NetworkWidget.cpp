@@ -1,6 +1,7 @@
 #include "include/widgets/networkwidget.h"
 #include "include/networkconnectionsmodel.h"
 #include <qhostaddress.h>
+#include <qmenu.h>
 
 
 NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) : QWidget(parent)
@@ -35,6 +36,16 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	m_action_server_stop->setChecked(true);
 	connect(m_action_server_stop, SIGNAL(triggered(bool)),
 		this, SLOT(on_action_server_stop()));
+
+	m_action_kick = new QAction(QString::fromLocal8Bit("Выгнать нахрен"), this);
+	connect(m_action_kick, SIGNAL(triggered(bool)),
+		this, SLOT(on_action_kick()));
+
+	ui.connections_view->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_context_menu = new QMenu(this);
+	m_context_menu->addAction(m_action_kick);
+	connect(ui.connections_view, SIGNAL(customContextMenuRequested(const QPoint&)),
+		this, SLOT(on_context_menu_requested(const QPoint&)));
 }
 
 
@@ -71,4 +82,23 @@ void NetworkWidget::on_action_server_stop()
 	m_action_server_start->setChecked(false);
 	m_action_server_stop->setChecked(true);
 	ui.label_adderss->setText("Server is not running");
+}
+
+
+
+void NetworkWidget::on_action_kick()
+{
+	auto selected_rows = ui.connections_view->selectionModel()->selectedRows();
+	if (selected_rows.isEmpty())
+		return;
+
+	m_mgr->kick_client_at_row(selected_rows[0].row());
+}
+
+
+ 
+void NetworkWidget::on_context_menu_requested(const QPoint& pos)
+{
+	m_cursor_pos = /*mapTo(ui.connections_view, pos)*/pos;
+	m_context_menu->exec(mapToGlobal(pos));
 }

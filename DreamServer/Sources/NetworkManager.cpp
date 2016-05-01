@@ -170,9 +170,8 @@ NetworkConnectionsModel* NetworkManager::create_model() const
 
 	connect(this, SIGNAL(connection_list_changed()),
 		ret, SLOT(on_connection_list_changed()));
-	// TODO : WTF???
 	connect(this, SIGNAL(client_status_changed(NetworkResponser*)),
-		ret, SLOT(client_status_changed(NetworkResponser*)));
+		ret, SLOT(on_client_status_changed(NetworkResponser*)));
 
 	return ret;
 }
@@ -205,4 +204,15 @@ void NetworkManager::on_responser_status_changed()
 {
 	NetworkResponser* responser = qobject_cast<NetworkResponser*>(sender());
 	emit client_status_changed(responser);
+}
+
+
+
+void NetworkManager::kick_client_at_row(int row)
+{
+	auto c = clients();
+
+	assert(row < c.size());
+
+	c[row]->kick();
 }
