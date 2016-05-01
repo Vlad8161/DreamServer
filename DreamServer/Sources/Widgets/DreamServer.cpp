@@ -43,7 +43,7 @@ ServerSolution::ServerSolution(QWidget *parent)
 
 	connect(m_tab_widget, SIGNAL(tabCloseRequested(int)),
 		this, SLOT(on_tab_close_requested(int)));
-	connect(m_repo, SIGNAL(order_added(int, int)),
+	connect(m_repo, SIGNAL(order_added(int)),
 		this, SLOT(on_order_added(int)));
 	connect(m_closed_table_widget, SIGNAL(undo_btn_clicked()),
 		this, SLOT(on_undo_btn_clicked()));

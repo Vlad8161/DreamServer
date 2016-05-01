@@ -92,7 +92,33 @@ void OrdersDatabase::add_order(const Order& order)
 		.arg(order.time_prepared)
 		.arg(order.status)
 		.arg(order.notes));
-	
+	m_pool.start(maker);
+}
+
+
+
+void OrdersDatabase::add_orders(QVector<Order*>::iterator begin, QVector<Order*>::iterator end)
+{
+	if (begin == end)
+		return;
+
+	QString str_query = "INSERT INTO Orders "
+		"(Id, Name, Count, TableNum, TimeGot, TimePrepared, Status, Notes) VALUES ";
+
+	for (auto i = begin; i != end; i++) {
+		str_query.append(QString("(%1, '%2', %3, %4, '%5', '%6', %7, '%8'),")
+			.arg((*i)->id)
+			.arg((*i)->name)
+			.arg((*i)->count)
+			.arg((*i)->table_num)
+			.arg((*i)->time_got)
+			.arg((*i)->time_prepared)
+			.arg((*i)->status)
+			.arg((*i)->notes));
+	}
+	str_query[str_query.size() - 1] = ';';
+
+	SqlMaker* maker = new SqlMaker(m_sql_query, str_query);
 	m_pool.start(maker);
 }
 
@@ -135,4 +161,3 @@ void OrdersDatabase::remove_all_table_orders(int id)
 		QString("DELETE FROM Orders WHERE TableNum=%1;").arg(id));
 	m_pool.start(maker);
 }
-

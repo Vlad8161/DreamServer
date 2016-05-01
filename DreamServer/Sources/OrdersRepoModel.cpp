@@ -130,7 +130,7 @@ void OrdersRepoModel::on_repo_changed(int t_num)
 
 
 
-void OrdersRepoModel::on_order_added(int t_num, int row)
+void OrdersRepoModel::on_order_added(int t_num)
 {
 	if (t_num != m_table_num)
 		return;

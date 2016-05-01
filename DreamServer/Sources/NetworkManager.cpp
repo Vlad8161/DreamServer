@@ -170,6 +170,7 @@ NetworkConnectionsModel* NetworkManager::create_model() const
 
 	connect(this, SIGNAL(connection_list_changed()),
 		ret, SLOT(on_connection_list_changed()));
+	// TODO : WTF???
 	connect(this, SIGNAL(client_status_changed(NetworkResponser*)),
 		ret, SLOT(client_status_changed(NetworkResponser*)));
 

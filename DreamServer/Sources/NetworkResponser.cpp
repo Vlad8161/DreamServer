@@ -4,6 +4,7 @@
 
 #include <qtcpsocket.h>
 #include <qdebug.h>
+#include <qdatetime.h>
 #include <qbuffer.h>
 #include <qhostaddress.h>
 #include <qjsondocument.h>
@@ -11,15 +12,6 @@
 #include <qjsonarray.h>
 
 #include <stdlib.h>
-
-
-struct PreOrder {
-	int id_course;
-	int count;
-	int t_num;
-	QString notes;
-};
-
 
 NetworkResponser::NetworkResponser(QTcpSocket* socket, MenuDatabaseModel* menu, OrdersRepo* repo,
 	QString* cached_menu, QString* cached_hash)
@@ -210,6 +202,11 @@ void NetworkResponser::m_handle_make_order_request(const QJsonObject& root)
 	QStringList str_order_items = str_order.split("\n");
 	QVector<PreOrder> pre_orders;
 
+	qDebug() << "NetworkResponser: starting handling make order request " 
+			 << QTime::currentTime().toString("hh:mm:ss.zzz") << "\n";
+
+	int c = 0;
+
 	for (auto& i : str_order_items) {
 		bool ok;
 		PreOrder o;
@@ -245,13 +242,21 @@ void NetworkResponser::m_handle_make_order_request(const QJsonObject& root)
 		o.notes = order_item_fields[3];
 	
 		pre_orders.push_back(o);
+
+		qDebug() << "NetworkResponser: order " << c++ << " received in "
+			     << QTime::currentTime().toString("hh:mm:ss.zzz") << "\n";
 	}
 
-	for (auto& i : pre_orders)
-		m_repo->add_order(i.id_course, i.t_num, i.count, i.notes);
-
-	response["response_code"] = ResponseCodes::OrderMade;
+	if (m_repo->add_orders(pre_orders)) {
+		response["response_code"] = ResponseCodes::OrderMade;
+	}
+	else {
+		response["response_code"] = ResponseCodes::ErrorInvalidRequest;
+	}
 	m_send_response(response);
+
+	qDebug() << "NetworkResponser: order " << c++ << " response sent in "
+			 << QTime::currentTime().toString("hh:mm:ss.zzz") << "\n";
 }
 
 

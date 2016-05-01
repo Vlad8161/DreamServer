@@ -22,7 +22,7 @@ public:
 
 public slots:
 	void on_repo_changed(int t_num);
-	void on_order_added(int t_num, int row);
+	void on_order_added(int t_num);
 	void on_double_click(const QModelIndex& index);
 
 private:

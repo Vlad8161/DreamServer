@@ -3,6 +3,7 @@
 
 #include <qthreadpool.h>
 #include <qsqldatabase.h>
+#include <qvector.h>
 #include "Order.h"
 
 class QSqlQuery;
@@ -28,6 +29,7 @@ public:
 	OrdersDatabase(QSqlDatabase db);
 	~OrdersDatabase();
 	void add_order(const Order& order);
+	void add_orders(QVector<Order*>::iterator begin, QVector<Order*>::iterator end);
 	void change_order_status(int id, int new_status);
 	void set_time_stamp(int id, QString time_stamp);
 	void remove_order(int id);
