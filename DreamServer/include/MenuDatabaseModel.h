@@ -63,6 +63,7 @@ private:
 	TreeNode* m_root;
 	QMap<int, TreeNode*> m_items;
 	int free_id;
+	int free_img_id;
 };
 
 #endif

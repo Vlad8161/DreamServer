@@ -47,7 +47,7 @@ bool MenuDatabase::add_menu_item(const MenuItem& item)
 
 bool MenuDatabase::remove_menu_item(int id)
 {
-	m_sql_query->prepare(QString("DELETE FROM Menu WHERE Id=?;").arg(id));
+	m_sql_query->prepare(QString("DELETE FROM Menu WHERE Id=?;"));
 	m_sql_query->bindValue(0, id);
 
 	if (!m_sql_query->exec())

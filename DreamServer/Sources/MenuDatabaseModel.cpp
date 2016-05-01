@@ -14,7 +14,6 @@ MenuDatabaseModel::MenuDatabaseModel(QSqlDatabase db) : m_menu_db(db)
 	m_root = new TreeNode();
 	m_root->parent = nullptr;
 
-	free_id = 0;
 	for (auto& i : items) {
 		MenuItem* item = new MenuItem(i);
 
