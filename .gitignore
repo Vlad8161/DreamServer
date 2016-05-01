@@ -260,3 +260,6 @@ Win32/
 
 # Logs
 log.txt
+
+/Win32/Debug/*
+!/Win32/Debug/DreamServer.exe
