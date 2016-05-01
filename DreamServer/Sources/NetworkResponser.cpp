@@ -119,6 +119,7 @@ void NetworkResponser::m_handle_auth_request(const QJsonObject& root)
 
 	if (root.contains("name")) {
 		m_name = root["name"].toString() + " (" + m_socket->peerAddress().toString() + ")";
+		m_name.remove('\n');
 		emit status_changed();
 	}
 
