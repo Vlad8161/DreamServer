@@ -388,3 +388,11 @@ TreeNode* MenuDatabaseModel::m_get_category(const QString& category)
 
 	return found;
 }
+
+
+
+const QImage& MenuDatabaseModel::get_image(int id) const
+{
+	assert(m_items.contains(id));
+	return m_items[id]->data->img;
+}

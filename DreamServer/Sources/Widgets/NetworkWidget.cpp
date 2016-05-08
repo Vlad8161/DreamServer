@@ -99,6 +99,6 @@ void NetworkWidget::on_action_kick()
  
 void NetworkWidget::on_context_menu_requested(const QPoint& pos)
 {
-	m_cursor_pos = /*mapTo(ui.connections_view, pos)*/pos;
+	m_cursor_pos = pos;
 	m_context_menu->exec(mapToGlobal(pos));
 }

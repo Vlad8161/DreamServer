@@ -35,6 +35,7 @@ public:
 	QModelIndex add_menu_item(const QModelIndex& category);
 	void remove_menu_item(const QModelIndex& index);
 	bool set_image(const QModelIndex& index, const QImage& img);
+	const QImage& get_image(int id) const;
 
 	// Model interface
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override;

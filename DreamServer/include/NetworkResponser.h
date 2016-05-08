@@ -15,7 +15,8 @@ enum ActionCodes {
 	CheckSync = 2,
 	RequestMenu = 3,
 	MakeOrder = 4,
-	CheckConnection = 5
+	CheckConnection = 5,
+	GetImage = 6
 };
 
 enum ResponseCodes {
@@ -29,7 +30,9 @@ enum ResponseCodes {
 	ErrorInvalidCourseId = 8,
 	ErrorAccessDeniedAuth = 9,
 	ErrorAccessDeniedSync = 10,
-	IAmHere = 11
+	IAmHere = 11,
+	Image = 12,
+	NoImage = 13
 };
 
 
@@ -70,6 +73,7 @@ private:
 	void m_handle_menu_request(const QJsonObject& root);
 	void m_handle_make_order_request(const QJsonObject& root);
 	void m_handle_check_connection();
+	void m_handle_image_request(const QJsonObject& root);
 	// отправка данных
 	void m_send_response(const QJsonObject& root, const QByteArray& appendix = QByteArray());
 

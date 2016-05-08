@@ -90,6 +90,9 @@ void NetworkResponser::on_ready_read()
 		else if (action_code == ActionCodes::CheckConnection) {
 			m_handle_check_connection();
 		}
+		else if (action_code == ActionCodes::GetImage) {
+			m_handle_image_request(root);
+		}
 		else {
 			QJsonObject response;
 			response["response_code"] = ResponseCodes::ErrorInvalidRequest;
@@ -272,6 +275,49 @@ void NetworkResponser::m_handle_check_connection()
 
 
 
+void NetworkResponser::m_handle_image_request(const QJsonObject& root)
+{
+	QJsonObject response;
+
+	if (!root.contains("image_id")) {
+		response["response_code"] = ResponseCodes::ErrorInvalidRequest;
+		m_send_response(response);
+		return;
+	}
+
+	int id = root["image_id"].toInt();
+	
+	if (!m_menu->contains(id)) {
+		response["response_code"] = ResponseCodes::ErrorInvalidCourseId;
+		m_send_response(response);
+		return;
+	}
+
+	auto img = m_menu->get_image(id);
+	if (img.isNull()) {
+		response["response_code"] = ResponseCodes::NoImage;
+		m_send_response(response);
+		return;
+	}
+
+	QByteArray ba;
+	QBuffer buffer(&ba);
+	img.save(&buffer, "PNG");
+
+	if (ba.isEmpty() || ba.size() > 1000000) {
+		response["response_code"] = ResponseCodes::NoImage;
+		m_send_response(response);
+		return;
+	}
+
+	response["response_code"] = ResponseCodes::Image;
+	response["image_id"] = id;
+	m_send_response(response, ba);
+	return;
+}
+
+
+
 void NetworkResponser::increment_ticks()
 {
 	m_unresponsed_ticks++;
@@ -290,7 +336,7 @@ void NetworkResponser::m_send_response(const QJsonObject& root, const QByteArray
 	quint32 response_size = json_size + sizeof(json_size) + appendix.size();
 	response.insert(0, (char*)&json_size, sizeof(json_size));
 	response.insert(0, (char*)&response_size, sizeof(response_size));
-	if (appendix.size() != 0)
+	if (!appendix.isEmpty())
 		response.append(appendix);
 	m_socket->write(response);
 	m_socket->flush();
