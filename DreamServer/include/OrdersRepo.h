@@ -3,17 +3,10 @@
 
 
 #include "OrdersDatabase.h"
+#include "OrdersRepoCache.h"
 #include "MenuDatabaseModel.h"
 
 class OrdersRepoModel;
-
-struct PreOrder {
-	int id_course;
-	int count;
-	int t_num;
-	QString notes;
-};
-
 
 // OrdersRepo - класс представляющий хранилище текущих заказов
 // предоставляет интерфейс к заказам по id, возвращает 
@@ -26,10 +19,10 @@ class OrdersRepo : public QObject
 public:
 	OrdersRepo(QSqlDatabase db, MenuDatabaseModel* menu_db);
 	~OrdersRepo();
-	QList<Order*> query_table_orders(int t_nums) const;
-	QList<int> opened_tables() const { return m_table_orders.keys(); }
-	const Order* order(int t_num, int row) const;
-	int n_table_orders(int t_num) const;
+	QList<Order*> query_table_orders(int t_num) const { return m_cache->query_table_orders(t_num); }
+	QList<int> opened_tables() const { return m_cache->opened_tables; }
+	const Order* order(int t_num, int row) const { return m_cache->order(t_num, row); }
+	int n_table_orders(int t_num) const { return m_cache->n_table_orders(t_num); }
 	void add_order(int course_id, int t_num, int count, QString notes);
 	bool add_orders(const QVector<PreOrder>& orders);
 	bool set_order_status(int t_num, int row, int status);
@@ -41,13 +34,11 @@ public:
 	OrdersRepoModel* create_model(int t_num);
 
 private:
-	void m_init_orders_list();
-
-private:
 	OrdersDatabase m_db;
 	MenuDatabaseModel *m_menu_db;
-	QMap<int, QList<Order*> > m_table_orders;
+	OrdersRepoCache* m_cache;
 	int m_max_id;
+
 
 signals:
 	void order_added(int t_num);

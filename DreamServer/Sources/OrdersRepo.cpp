@@ -12,65 +12,24 @@
 OrdersRepo::OrdersRepo(QSqlDatabase db, MenuDatabaseModel* menu_db) : m_db(db)
 {
 	assert(menu_db != nullptr);
+
 	m_menu_db = menu_db;
-	m_init_orders_list();
+
+	QVector<Order> orders;
+	m_db.query_orders(orders);
+	m_cache = new OrdersRepoCache(orders);
+
+	m_max_id = std::max_element(orders.begin(), orders.end(),
+		[](const Order& o1, const Order& o2) {
+		return o1.id > o2.id;
+	})->id;
 }
 
 
 
 OrdersRepo::~OrdersRepo()
 {
-	for (auto& i : m_table_orders) {
-		for (auto j : i)
-			delete j;
-	}
-}
-
-
-// метод восстанавливает из базы данных заказы, находившиеся там
-// и инициализирует переменнух m_max_id, необходимую для
-// генерации нового заказа
-void OrdersRepo::m_init_orders_list()
-{
-	QVector<Order> orders;
-
-	m_max_id = 0;
-
-	m_db.query_orders(orders);
-
-	for (auto i = orders.begin(); i != orders.end(); i++) {
-		Order* new_order = new Order(*i);
-
-		if (new_order->id > m_max_id)
-			m_max_id = new_order->id;
-
-		if (!m_table_orders.contains(i->table_num)) {
-			m_table_orders[i->table_num] = QList<Order*>();
-		}
-
-		m_table_orders[i->table_num].push_back(new_order);
-	}
-}
-
-
-
-QList<Order*> OrdersRepo::query_table_orders(int t_num) const
-{
-	if (!m_table_orders.contains(t_num)) {
-		return QList<Order*>() ;
-	}
-	else {
-		return m_table_orders[t_num];
-	}
-}
-
-
-
-const Order* OrdersRepo::order(int t_num, int row) const
-{
-	assert(m_table_orders.contains(t_num));
-	assert(row < m_table_orders[t_num].size());
-	return m_table_orders[t_num][row];
+	delete m_cache;
 }
 
 
@@ -78,42 +37,29 @@ const Order* OrdersRepo::order(int t_num, int row) const
 // добавление нового заказа
 void OrdersRepo::add_order(int course_id, int t_num, int count, QString notes)
 {
-	Order* new_order = new Order;
+	Order o;
 	MenuItem course;
 
 	// получение информации о блюде по его id
 	course = m_menu_db->item(course_id);
 
 	// создание заказа
-	new_order->id = ++m_max_id;
-	new_order->name = course.name;
-	new_order->count = count;
-	new_order->notes = notes;
-	new_order->table_num = t_num;
-	new_order->status = Order::NOT_PREPARED;
-	new_order->time_got = QTime::currentTime().toString("hh:mm");
+	o.id = ++m_max_id;
+	o.name = course.name;
+	o.count = count;
+	o.notes = notes;
+	o.table_num = t_num;
+	o.status = Order::NOT_PREPARED;
+	o.time_got = QTime::currentTime().toString("hh:mm");
 
 	// добавление заказа в БД
-	m_db.add_order(*new_order); 
+	m_db.add_order(o); 
 
-	// начинаем добавлять новый заказ в список столов
-	// если стола с таким номером еще нет в списке, то добавляем новый
-	if (!m_table_orders.contains(new_order->table_num)) {
-		m_table_orders[new_order->table_num] = QList<Order*>();
-	}
-
-	// здесь ищем необходимую позицию для нового заказа и вставляем его туда
-	int row_num = 0;
-	auto i = m_table_orders[new_order->table_num].begin();
-	auto end = m_table_orders[new_order->table_num].end();
-	while (i != end && (*i)->status <= new_order->status) {
-		row_num++;
-		i++;
-	}
-	m_table_orders[new_order->table_num].insert(i, new_order);
+	// добавление в кэш
+	m_cache->add_order(o);
 
 	// сигналим, что добавлен новый заказ
-	emit order_added(new_order->table_num);
+	emit order_added(t_num);
 }
 
 
@@ -137,34 +83,21 @@ bool OrdersRepo::add_orders(const QVector<PreOrder>& pre_orders)
 		auto iter_insert_begin = orders.begin();
 		auto iter_insert_end = std::transform(iter_start, iter_end, iter_insert_begin,
 			[this](const PreOrder& o) {
-			Order* new_order = new Order;
+			Order order;
 			MenuItem course = m_menu_db->item(o.id_course);
 
 			// создание заказа
-			new_order->id = ++m_max_id;
-			new_order->name = course.name;
-			new_order->count = o.count;
-			new_order->notes = o.notes;
-			new_order->table_num = o.t_num;
-			new_order->status = Order::NOT_PREPARED;
-			new_order->time_got = QTime::currentTime().toString("hh:mm");
+			order.id = ++m_max_id;
+			order.name = course.name;
+			order.count = o.count;
+			order.notes = o.notes;
+			order.table_num = o.t_num;
+			order.status = Order::NOT_PREPARED;
+			order.time_got = QTime::currentTime().toString("hh:mm");
 
-			// начинаем добавлять новый заказ в список столов
-			// если стола с таким номером еще нет в списке, то добавляем новый
-			if (!m_table_orders.contains(new_order->table_num))
-				m_table_orders[new_order->table_num] = QList<Order*>();
+			m_cache->add_order(order);
 
-			// здесь ищем необходимую позицию для нового заказа и вставляем его туда
-			int row_num = 0;
-			auto i = m_table_orders[new_order->table_num].begin();
-			auto end = m_table_orders[new_order->table_num].end();
-			while (i != end && (*i)->status <= new_order->status) {
-				row_num++;
-				i++;
-			}
-			m_table_orders[new_order->table_num].insert(i, new_order);
-
-			return new_order;
+			return order;
 		});
 		m_db.add_orders(iter_insert_begin, iter_insert_end);
 		iter_start = iter_end;
@@ -214,6 +147,7 @@ bool OrdersRepo::is_table_served(int t_num)
 
 	return true;
 }
+
 
 
 // закрываем стол

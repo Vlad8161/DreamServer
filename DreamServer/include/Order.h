@@ -44,4 +44,11 @@ public:
 bool operator==(const Order& ord1, const Order& ord2);
 
 
+
+struct PreOrder {
+	int id_course;
+	int count;
+	int t_num;
+	QString notes;
+};
 #endif
