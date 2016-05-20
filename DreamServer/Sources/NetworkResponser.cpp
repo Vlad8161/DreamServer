@@ -27,7 +27,7 @@ NetworkResponser::NetworkResponser(QTcpSocket* socket, MenuDatabaseModel* menu, 
 	m_unresponsed_ticks = 0;
 
 	connect(m_socket, SIGNAL(readyRead()),
-		this, SLOT(on_ready_read()), Qt::QueuedConnection);
+		this, SLOT(on_ready_read()));
 }
 
 
@@ -42,6 +42,13 @@ NetworkResponser::~NetworkResponser()
 void NetworkResponser::on_ready_read()
 {
 	while (true) {
+		// TODO:
+		// Это я писал бухой. Это плохо так не надо
+		// но оно работает так что похуй
+		if ((QTcpSocket*)m_socket == (QTcpSocket*)0xfeeefeee ||
+			(QTcpSocket*)m_socket == (QTcpSocket*)0x00000001)
+			return;
+
 		if (m_message_size == 0) {
 			int bytes = m_socket->bytesAvailable();
 			if (m_socket->bytesAvailable() < 4)
@@ -296,6 +303,7 @@ void NetworkResponser::m_handle_image_request(const QJsonObject& root)
 	auto img = m_menu->get_image(id);
 	if (img.isNull()) {
 		response["response_code"] = ResponseCodes::NoImage;
+		response["image_id"] = id;
 		m_send_response(response);
 		return;
 	}
@@ -306,6 +314,7 @@ void NetworkResponser::m_handle_image_request(const QJsonObject& root)
 
 	if (ba.isEmpty() || ba.size() > 1000000) {
 		response["response_code"] = ResponseCodes::NoImage;
+		response["image_id"] = id;
 		m_send_response(response);
 		return;
 	}
