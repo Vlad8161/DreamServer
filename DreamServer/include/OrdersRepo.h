@@ -19,15 +19,21 @@ class OrdersRepo : public QObject
 public:
 	OrdersRepo(QSqlDatabase db, MenuDatabaseModel* menu_db);
 	~OrdersRepo();
+    /**
+     * ѕосле возвращени€ списка класс OrdersRepo по 
+     * прежнему владеет возвращаемыми заказами, поэтому их
+     * нельз€ удал€ть и вне OrderRepo и нужно быть
+     * готовым к тому что указатели станут невалидными
+     */
 	QList<Order*> query_table_orders(int t_num) const { return m_cache->query_table_orders(t_num); }
-	QList<int> opened_tables() const { return m_cache->opened_tables; }
+	QList<int> opened_tables() const { return m_cache->opened_tables(); }
 	const Order* order(int t_num, int row) const { return m_cache->order(t_num, row); }
 	int n_table_orders(int t_num) const { return m_cache->n_table_orders(t_num); }
 	void add_order(int course_id, int t_num, int count, QString notes);
 	bool add_orders(const QVector<PreOrder>& orders);
 	bool set_order_status(int t_num, int row, int status);
 	bool close_table(int table_num);
-	bool is_table_served(int t_num);
+    bool is_table_served(int t_num) const { return m_cache->is_table_served(t_num); }
 	void restore_orders(const QList<Order>& orders);
 
 	//—ледующа€ функци€ возвращает модель дл€ одного стола

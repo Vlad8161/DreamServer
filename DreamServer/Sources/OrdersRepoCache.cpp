@@ -1,7 +1,8 @@
 #include "include/OrdersRepoCache.h"
-#include <assert.h>
 #include <qdatetime.h>
+#include <qvector.h>
 #include <algorithm>
+#include <assert.h>
 
 OrdersRepoCache::OrdersRepoCache(const QVector<Order>& orders)
 {
@@ -58,7 +59,7 @@ int OrdersRepoCache::n_table_orders(int t_num) const
 		return 0;
 	}
 	else {
-		m_table_orders[t_num].size();
+		return m_table_orders[t_num].size();
 	}
 }
 
@@ -118,7 +119,7 @@ void OrdersRepoCache::remove_orders(int table_num)
 	for (auto& i : m_table_orders[table_num]) {
 		delete i;
 	}
-	m_table_orders.clear();
+	m_table_orders[table_num].clear();
 }
 
 
@@ -127,7 +128,7 @@ void OrdersRepoCache::remove_orders(int table_num)
 bool OrdersRepoCache::is_table_served(int t_num)
 {
 	return std::all_of(m_table_orders[t_num].begin(), m_table_orders[t_num].end(),
-		[t_num](const Order* o) { return o->table_num == t_num; });
+		[t_num](const Order* o) { return o->status == Order::SERVED; });
 }
 
 

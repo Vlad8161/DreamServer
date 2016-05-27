@@ -4,6 +4,7 @@
 #include <qvector.h>
 #include <qdatetime.h>
 #include <qsqlquery.h>
+#include <qsqlerror.h>
 #include <qdebug.h>
 
 
@@ -23,6 +24,8 @@ void SqlMaker::run()
 	m_query->exec(m_text);
 	cur_time = QTime::currentTime().toString("hh:mm:ss");
 	qDebug() << "SqlMaker::run() : \"" << m_text << "\" end at " << cur_time;
+    if (!m_query->isActive())
+        qDebug() << m_query->lastError();
 	assert(m_query->isActive());
 }
 
@@ -97,7 +100,7 @@ void OrdersDatabase::add_order(const Order& order)
 
 
 
-void OrdersDatabase::add_orders(QVector<Order*>::iterator begin, QVector<Order*>::iterator end)
+void OrdersDatabase::add_orders(QVector<Order>::iterator begin, QVector<Order>::iterator end)
 {
 	if (begin == end)
 		return;
@@ -107,14 +110,15 @@ void OrdersDatabase::add_orders(QVector<Order*>::iterator begin, QVector<Order*>
 
 	for (auto i = begin; i != end; i++) {
 		str_query.append(QString("(%1, '%2', %3, %4, '%5', '%6', %7, '%8'),")
-			.arg((*i)->id)
-			.arg((*i)->name)
-			.arg((*i)->count)
-			.arg((*i)->table_num)
-			.arg((*i)->time_got)
-			.arg((*i)->time_prepared)
-			.arg((*i)->status)
-			.arg((*i)->notes));
+			.arg(i->id)
+			.arg(i->name)
+			.arg(i->count)
+			.arg(i->table_num)
+			.arg(i->time_got)
+			.arg(i->time_prepared)
+			.arg(i->status)
+			.arg(i->notes)
+        );
 	}
 	str_query[str_query.size() - 1] = ';';
 

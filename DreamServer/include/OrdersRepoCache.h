@@ -13,15 +13,32 @@ class OrdersRepoCache : public QObject
 
 public:
 	OrdersRepoCache(const QVector<Order>& orders);
+
 	~OrdersRepoCache();
+
+    /**
+     * Возвращает список указателей на заказы,
+     * сохраняя при этом ответственность за них
+     */
 	QList<Order*> query_table_orders(int t_num) const;
+
 	QList<int> opened_tables() const { return m_table_orders.keys(); }
+
+    bool is_table_opened(int t_num) const { return m_table_orders.contains(t_num); }
+
+    /* Возвращает указатель на заказ или nullptr если заказа нет */
 	const Order* order(int t_num, int row) const;
+
 	int n_table_orders(int t_num) const;
+    
 	void add_order(const Order& order);
+    
 	void add_orders(const QList<Order>& orders);
+    
 	void remove_orders(int table_num);
+    
 	void update_order(int t_num, int row, int status, const QString& time_prepared);
+    
 	bool is_table_served(int t_num);
 
 private:

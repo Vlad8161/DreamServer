@@ -21,7 +21,7 @@ OrdersRepo::OrdersRepo(QSqlDatabase db, MenuDatabaseModel* menu_db) : m_db(db)
 
 	m_max_id = std::max_element(orders.begin(), orders.end(),
 		[](const Order& o1, const Order& o2) {
-		return o1.id > o2.id;
+		return o1.id < o2.id;
 	})->id;
 }
 
@@ -66,7 +66,7 @@ void OrdersRepo::add_order(int course_id, int t_num, int count, QString notes)
 
 bool OrdersRepo::add_orders(const QVector<PreOrder>& pre_orders)
 {
-	QVector<Order*> orders = QVector<Order*>(50, nullptr);
+	QVector<Order> orders = QVector<Order>(50);
 
 	if (pre_orders.isEmpty())
 		return true;
@@ -123,29 +123,9 @@ void OrdersRepo::restore_orders(const QList<Order>& orders)
 		m_db.add_order(*new_order);
 
 		// Добавляем в список столов
-		int row_num = 0;
-		auto j = m_table_orders[new_order->table_num].begin();
-		auto end = m_table_orders[new_order->table_num].end();
-		while (j != end && (*j)->status <= new_order->status) {
-			row_num++;
-			j++;
-		}
-		m_table_orders[new_order->table_num].insert(j, new_order);
+        m_cache->add_order(*new_order);
 	}
 	emit table_changed(t_num);
-}
-
-
-// проверяем обслужен ли стол
-bool OrdersRepo::is_table_served(int t_num)
-{
-	// убеждаемся, что все заказы обслужены, иначе выходим
-	for (auto& i : m_table_orders[t_num]) {
-		if (i->status != Order::SERVED)
-			return false;
-	}
-
-	return true;
 }
 
 
@@ -153,19 +133,11 @@ bool OrdersRepo::is_table_served(int t_num)
 // закрываем стол
 bool OrdersRepo::close_table(int table_num)
 {
-	// если стол не открыт, то выходим из метода
-	if (!m_table_orders.contains(table_num) ||
-		m_table_orders[table_num].isEmpty())
-		return false;
-
-	// если все таки все гуд, то поочередно удаляем заказы из репозитория, и чистим стол
-	for (auto elem : m_table_orders[table_num]) {
-		delete elem;
-	}
-	m_table_orders[table_num].clear();
-
 	// чистим БД
 	m_db.remove_all_table_orders(table_num);
+
+    // чистим кэш
+    m_cache->remove_orders(table_num);
 
 	// говорим, что содержимое стола изменилось
 	emit table_changed(table_num);
@@ -182,51 +154,31 @@ bool OrdersRepo::set_order_status(int t_num, int row, int status)
 	if (status < 0 || status > 2)
 		return false;
 
-	// ищем нужный заказ и меняем его статус
-	assert(m_table_orders.contains(t_num));
-	auto& table = m_table_orders[t_num];
-	assert(row < table.size());
+    const Order* o = m_cache->order(t_num, row);
+    if (o != nullptr) {
+        QString time_stamp;
 
-	Order* o = table[row];
-	int old_status = o->status;
-	o->status = status;
-	m_db.change_order_status(o->id, status);
-	if (old_status == Order::NOT_PREPARED && status != Order::NOT_PREPARED) {
-		o->time_prepared = QTime::currentTime().toString("hh:mm");
-		m_db.set_time_stamp(o->id, o->time_prepared);
-	}
-	else if (old_status != Order::NOT_PREPARED && status == Order::NOT_PREPARED) {
-		o->time_prepared = QString("");
-		m_db.set_time_stamp(o->id, o->time_prepared);
-	}
+        // генерируем временную метку
+        if (o->status == Order::NOT_PREPARED && status != Order::NOT_PREPARED) {
+            time_stamp = QTime::currentTime().toString("hh:mm");
+        }
+        else if (o->status != Order::NOT_PREPARED && status == Order::NOT_PREPARED) {
+            time_stamp = QString("");
+        }
 
-	// меняем позицию заказа в столе так чтобы стол был отсортирован по статусу
-	auto to = table.begin();
-	auto end = table.end();
-	while (to != end && (*to)->status <= o->status)
-		to++;
-	int i_from = row;
-	int i_to = to - table.begin();
-	if (i_to > i_from)
-		i_to--;
-	table.move(i_from, i_to);
+        // обновляем базу и кэш
+        m_db.change_order_status(o->id, status);
+        m_db.set_time_stamp(o->id, time_stamp);
+        m_cache->update_order(t_num, row, status, time_stamp);
 
-	// говорим, что стол изменился
-	emit table_changed(o->table_num);
+        // говорим, что стол изменился
+        emit table_changed(o->table_num);
 
-	return true;
-}
-
-
-
-int OrdersRepo::n_table_orders(int t_num) const
-{
-	if (m_table_orders.contains(t_num)) {
-		return m_table_orders[t_num].size();
-	}
-	else {
-		return 0;
-	}
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 
