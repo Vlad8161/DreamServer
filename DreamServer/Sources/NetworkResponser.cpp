@@ -296,6 +296,7 @@ void NetworkResponser::m_handle_image_request(const QJsonObject& root)
 	auto img = m_menu->get_image(id);
 	if (img.isNull()) {
 		response["response_code"] = ResponseCodes::NoImage;
+		response["image_id"] = id;
 		m_send_response(response);
 		return;
 	}
@@ -306,6 +307,7 @@ void NetworkResponser::m_handle_image_request(const QJsonObject& root)
 
 	if (ba.isEmpty() || ba.size() > 1000000) {
 		response["response_code"] = ResponseCodes::NoImage;
+		response["image_id"] = id;
 		m_send_response(response);
 		return;
 	}
