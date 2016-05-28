@@ -28,6 +28,7 @@ ServerSolution::ServerSolution(QWidget *parent)
 	m_repo = new OrdersRepo(orders_connection, menu);
 	NetworkManager* network_manager = new NetworkManager(menu, m_repo);
 	m_menu_widget = new MenuWidget(menu);
+    m_menu_dock = new QDockWidget(this);
 	m_network_widget = new NetworkWidget(network_manager);
 	m_network_dock = new QDockWidget(this);
 
@@ -40,6 +41,11 @@ ServerSolution::ServerSolution(QWidget *parent)
 	m_network_dock->setWindowTitle(QString::fromLocal8Bit("Состояние сети"));
 	addDockWidget(Qt::RightDockWidgetArea, m_network_dock);
 	m_network_dock->close();
+
+	m_menu_dock->setWidget(m_menu_widget);
+	m_menu_dock->setWindowTitle(QString::fromLocal8Bit("Меню"));
+	addDockWidget(Qt::LeftDockWidgetArea, m_menu_dock);
+	m_menu_dock->close();
 
 	connect(m_tab_widget, SIGNAL(tabCloseRequested(int)),
 		this, SLOT(on_tab_close_requested(int)));
@@ -73,11 +79,8 @@ void ServerSolution::create_actions()
 	m_action_network = m_network_dock->toggleViewAction();
 	m_action_network->setIcon(QIcon(":/Resources/Icons/net.png"));
 
-	m_action_show_menu = new QAction(this);
-	m_action_show_menu->setText(QString::fromLocal8Bit("Меню"));
+    m_action_show_menu = m_menu_dock->toggleViewAction();
 	m_action_show_menu->setIcon(QIcon(":/Resources/Icons/menu.png"));
-	connect(m_action_show_menu, SIGNAL(triggered(bool)),
-		this, SLOT(on_action_show_menu()));
 }
 
 
@@ -242,13 +245,6 @@ void ServerSolution::on_tray_activated(QSystemTrayIcon::ActivationReason reason)
         this->show();
         this->activateWindow();
     }
-}
-
-
-
-void ServerSolution::on_action_show_menu()
-{	
-    m_menu_widget->exec();
 }
 
 

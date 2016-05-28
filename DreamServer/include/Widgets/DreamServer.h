@@ -27,7 +27,6 @@ public slots:
 	void on_order_added(int t_num);
 	void on_undo_btn_clicked();
 	void on_tray_activated(QSystemTrayIcon::ActivationReason reason);
-	void on_action_show_menu();
 	void on_action_quit();
 	void on_action_show_main_window();
 
@@ -46,6 +45,7 @@ private:
 
 	QTabWidget* m_tab_widget;
 	QDockWidget* m_network_dock;
+	QDockWidget* m_menu_dock;
 	MenuWidget* m_menu_widget;
 	ClosedTableWidget* m_closed_table_widget;
 	NetworkWidget* m_network_widget;

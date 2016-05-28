@@ -119,6 +119,8 @@ void MenuDatabaseModel::remove_menu_item(const QModelIndex& index)
 	TreeNode* node = static_cast<TreeNode*>(index.internalPointer());
 	MenuItem* item = node->data;
 
+	beginRemoveRows(index.parent(), index.row(), index.row());
+
 	if (item->id != -1) {
 		// item
 		bool ok = m_menu_db.remove_menu_item(item->id);
@@ -133,13 +135,13 @@ void MenuDatabaseModel::remove_menu_item(const QModelIndex& index)
 			m_items.remove(i->data->id);
 	}
 
-	beginResetModel();
 
 	m_tree_delete_item(node);
 
+	endRemoveRows();
+
 	emit menu_changed();
 
-	endResetModel();
 }
 
 
@@ -215,6 +217,9 @@ bool MenuDatabaseModel::setData(const QModelIndex& index, const QVariant& value,
 		if (new_category.contains(";") || new_category.contains("\n"))
 			return false;
 
+        if (new_category == item->name)
+            return false;
+
 		bool ok = m_menu_db.rename_category(item->name, new_category);
 		assert(ok);
 
@@ -231,6 +236,9 @@ bool MenuDatabaseModel::setData(const QModelIndex& index, const QVariant& value,
 
 		if (new_name.contains(";") || new_name.contains("\n"))
 			return false;
+
+        if (new_name == item->name)
+            return false;
 
 		bool ok = m_menu_db.change_name(item->id, new_name);
 		assert(ok);
