@@ -133,6 +133,9 @@
     <CustomBuild Include="include\MenuItemDelegate.h">
       <Filter>Header Files\Menu</Filter>
     </CustomBuild>
+    <CustomBuild Include="include\OrdersRepoCache.h">
+      <Filter>Header Files\Orders</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_MenuDatabaseModel.cpp">
@@ -260,6 +263,15 @@
     </ClCompile>
     <ClCompile Include="sources\SettingsWidget.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_OrdersRepoCache.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\OrdersRepoCache.cpp">
+      <Filter>Source Files\Orders</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_OrdersRepoCache.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
