@@ -33,6 +33,9 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QComboBox" name="select_interface"/>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">

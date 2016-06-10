@@ -22,6 +22,9 @@ public slots:
 	void on_action_server_stop();
 	void on_action_kick();
 	void on_context_menu_requested(const QPoint& pos);
+    void on_combo_box_index_changed(const QString&);
+    void on_server_started();
+    void on_server_stopped();
 
 private:
 	Ui::network_widget ui;
