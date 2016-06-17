@@ -33,9 +33,9 @@ ServerSolution::ServerSolution(QWidget *parent)
 	m_network_dock = new QDockWidget(this);
 
 	create_actions();
+	create_tray_icon();
 	create_tool_bar();
 	create_central_widget();
-	create_tray_icon();
 
 	m_network_dock->setWidget(m_network_widget);
 	m_network_dock->setWindowTitle(QString::fromLocal8Bit("Состояние сети"));
@@ -75,7 +75,6 @@ ServerSolution::~ServerSolution()
 
 void ServerSolution::create_actions()
 {
-
 	m_action_network = m_network_dock->toggleViewAction();
 	m_action_network->setIcon(QIcon(":/Resources/Icons/net.png"));
 
@@ -92,6 +91,12 @@ void ServerSolution::create_tool_bar()
 	m_tool_bar->addSeparator();
 	m_tool_bar->addAction(m_action_show_menu);
 	m_tool_bar->addAction(m_action_network);
+
+    QWidget *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    m_tool_bar->addWidget(spacer);
+
+    m_tool_bar->addAction(m_action_quit);
 }
 
 

@@ -20,6 +20,7 @@ NetworkManager::NetworkManager(MenuDatabaseModel* menu_model, OrdersRepo* orders
 	m_repo = orders_repo;
 	m_tcp_server = new QTcpServer(this);
 	m_timer = new QTimer(this);
+    m_address = QHostAddress::LocalHost;
 
 	m_serialize_menu();
 
@@ -52,7 +53,7 @@ bool NetworkManager::start()
 	if (m_tcp_server->isListening())
 		return true;
 
-	if (!m_tcp_server->listen(QHostAddress::Any, m_port))
+	if (!m_tcp_server->listen(m_address, m_port))
 		return false;
 
 	emit server_started();
@@ -134,20 +135,32 @@ void NetworkManager::m_clear_clients_list()
 
 
 
+void NetworkManager::set_address(QHostAddress new_address)
+{
+    if (new_address == m_address)
+        return;
+
+    bool was_running = false;
+    if (is_running()) {
+        stop();
+        was_running = true;
+    }
+
+    m_address = new_address;
+
+    if (was_running) {
+        start();
+    }
+}
+
+
+
 QHostAddress NetworkManager::address() const
 {
-	QHostAddress ret;
-
-	if (!m_tcp_server->isListening())
-		return QHostAddress::Null;
-
-	auto addresses = QNetworkInterface::allAddresses();
-	for (auto& i : addresses) {
-		if (i != QHostAddress::LocalHost && i.toIPv4Address())
-			return i;
-	}
-
-	return QHostAddress::LocalHost;
+    if (!is_running())
+        return QHostAddress::Null;
+    else 
+        return m_address;
 }
 
 
@@ -175,6 +188,7 @@ NetworkConnectionsModel* NetworkManager::create_model() const
 
 	return ret;
 }
+
 
 
 void NetworkManager::m_serialize_menu()

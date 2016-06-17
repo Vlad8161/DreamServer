@@ -4,6 +4,8 @@
 #include <qfile.h>
 #include <qsqltablemodel.h>
 #include <qtextstream.h>
+#include <qlocalsocket.h>
+#include <qlocalserver.h>
 #include <fstream>
 
 std::ofstream logging_file("log.txt");
@@ -31,19 +33,28 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+    QLocalSocket s;
 
 	//qInstallMessageHandler(myMessageHandler);
-	
-	QFile css(":/MainSheet.css");
-	css.open(QIODevice::ReadOnly);
-	if (css.isOpen()) {
-		QByteArray ba = css.readAll();
-		QString sheet = ba;
-		a.setStyleSheet(sheet);
-	}
 
-	ServerSolution w;
-	w.show();
+    s.connectToServer("dpiki_dreamserver");
+    if (!s.waitForConnected(2)) {
+        QFile css(":/MainSheet.css");
+        css.open(QIODevice::ReadOnly);
+        if (css.isOpen()) {
+            QByteArray ba = css.readAll();
+            QString sheet = ba;
+            a.setStyleSheet(sheet);
+        }
 
-	return a.exec();
+        ServerSolution w;
+        QLocalServer new_app_inst_listener;
+        QObject::connect(&new_app_inst_listener, &QLocalServer::newConnection,
+            [&w]() { w.show(), w.activateWindow(); });
+        new_app_inst_listener.listen("dpiki_dreamserver");
+
+        w.show();
+
+        return a.exec();
+    }
 }

@@ -26,6 +26,8 @@ public:
 	~NetworkManager();
 	NetworkConnectionsModel* create_model() const;
 	QHostAddress address() const;
+    void set_address(QHostAddress new_address);
+    bool is_running() const { return m_tcp_server->isListening(); }
 	quint16 port() const;
 	QList<NetworkResponser*> clients() const { return m_clients.values(); }
 	int n_clients() const { return m_clients.count(); }
@@ -58,8 +60,9 @@ private:
 	QTimer* m_timer;
 	QString m_cached_menu;
 	QString m_cached_hash;
+    QHostAddress m_address;
 
-	int m_port = 13563;
+	static const int m_port = 13563;
 };
 
 #endif

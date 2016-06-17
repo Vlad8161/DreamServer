@@ -2,6 +2,8 @@
 #include "include/networkconnectionsmodel.h"
 #include <qhostaddress.h>
 #include <qmenu.h>
+#include <qsettings.h>
+#include <qnetworkinterface.h>
 
 
 NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) : QWidget(parent)
@@ -12,6 +14,46 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	m_model = network_manager->create_model();
 
 	ui.connections_view->setModel(m_model);
+
+    auto interfaces = QNetworkInterface::allInterfaces();
+
+    QVector < QPair < QString, QString > > v;
+    for (auto & i : interfaces) {
+        auto addresses = i.addressEntries();
+        auto real_addr = std::find_if(addresses.begin(), addresses.end(),
+            [](QNetworkAddressEntry & a) {
+            return a.ip().toIPv4Address() != 0;
+        });
+
+        if (real_addr != addresses.end()) {
+            v.push_back(QPair < QString, QString >(
+                i.humanReadableName(),
+                real_addr->ip().toString()
+            ));
+        }
+    }
+    v.push_front(QPair < QString, QString >(
+        "localhost",
+        "127.0.0.1"
+    ));
+
+    for (auto & i : v) {
+        ui.select_interface->addItem(i.first, i.second);
+    }
+
+    QSettings settings("dpiki", "dreamserver");
+    QString last_interfase_name = settings
+        .value("NetworkWidget/last_interface", "localhost")
+        .toString();
+    auto found = std::find_if(v.begin(), v.end(),
+        [&last_interfase_name](QPair < QString, QString > i) {
+        return i.first == last_interfase_name;
+    });
+
+    if (found != v.end())
+        ui.select_interface->setCurrentIndex(found - v.begin());
+
+    m_mgr->set_address(QHostAddress(ui.select_interface->currentData().toString()));
 
 	QHostAddress address = m_mgr->address();
 	if (address == QHostAddress::Null) {
@@ -34,24 +76,37 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	m_action_server_stop->setIcon(QIcon(":/Resources/Icons/stop.png"));
 	m_action_server_stop->setCheckable(true);
 	m_action_server_stop->setChecked(true);
-	connect(m_action_server_stop, SIGNAL(triggered(bool)),
-		this, SLOT(on_action_server_stop()));
 
 	m_action_kick = new QAction(QString::fromLocal8Bit("Выгнать нахрен"), this);
-	connect(m_action_kick, SIGNAL(triggered(bool)),
-		this, SLOT(on_action_kick()));
 
 	ui.connections_view->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_context_menu = new QMenu(this);
 	m_context_menu->addAction(m_action_kick);
+
+    connect(
+        ui.select_interface,
+        static_cast <void(QComboBox::*)(const QString&)> (&QComboBox::currentIndexChanged),
+        this,
+        &NetworkWidget::on_combo_box_index_changed);
+	connect(m_action_server_stop, SIGNAL(triggered(bool)),
+		this, SLOT(on_action_server_stop()));
+	connect(m_action_kick, SIGNAL(triggered(bool)),
+		this, SLOT(on_action_kick()));
 	connect(ui.connections_view, SIGNAL(customContextMenuRequested(const QPoint&)),
 		this, SLOT(on_context_menu_requested(const QPoint&)));
+    connect(m_mgr, &NetworkManager::server_started,
+        this, &NetworkWidget::on_server_started);
+    connect(m_mgr, &NetworkManager::server_stopped,
+        this, &NetworkWidget::on_server_stopped);
 }
 
 
 
 NetworkWidget::~NetworkWidget()
 {
+    QSettings settings("dpiki", "dreamserver");
+    settings.setValue("NetworkWidget/last_interface", ui.select_interface->currentText());
+
 	delete m_model;
 	delete m_mgr;
 }
@@ -60,18 +115,7 @@ NetworkWidget::~NetworkWidget()
 
 void NetworkWidget::on_action_server_start()
 {
-	if (m_mgr->start()) {
-		m_action_server_start->setChecked(true);
-		m_action_server_stop->setChecked(false);
-		QHostAddress address = m_mgr->address();
-		ui.label_adderss->setText(QString("%1:%2")
-			.arg(address.toString())
-			.arg(m_mgr->port()));
-	}
-	else {
-		m_action_server_start->setChecked(false);
-		m_action_server_stop->setChecked(true);
-	}
+    m_mgr->start();
 }
 
 
@@ -79,9 +123,36 @@ void NetworkWidget::on_action_server_start()
 void NetworkWidget::on_action_server_stop()
 {
 	m_mgr->stop();
+}
+
+
+
+void NetworkWidget::on_server_started()
+{
+    m_action_server_start->setChecked(true);
+    m_action_server_stop->setChecked(false);
+    QHostAddress address = m_mgr->address();
+    ui.label_adderss->setText(QString("%1:%2")
+        .arg(address.toString())
+        .arg(m_mgr->port()));
+}
+
+
+
+void NetworkWidget::on_server_stopped()
+{
 	m_action_server_start->setChecked(false);
 	m_action_server_stop->setChecked(true);
 	ui.label_adderss->setText("Server is not running");
+}
+
+
+
+void NetworkWidget::on_combo_box_index_changed(const QString&)
+{
+    QString current_ip = ui.select_interface->currentData().toString();
+    QHostAddress addr(current_ip);
+    m_mgr->set_address(addr);
 }
 
 
