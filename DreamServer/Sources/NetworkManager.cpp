@@ -50,14 +50,15 @@ NetworkManager::~NetworkManager()
 
 bool NetworkManager::start()
 {
-	if (m_tcp_server->isListening())
-		return true;
+    if (m_tcp_server->isListening()) {
+        emit server_started();
+        return true;
+    }
 
 	if (!m_tcp_server->listen(m_address, m_port))
 		return false;
 
 	emit server_started();
-
 	return true;
 }
 
@@ -68,9 +69,10 @@ void NetworkManager::stop()
 	if (m_tcp_server->isListening()) {
 		m_tcp_server->close();
 		m_clear_clients_list();
-		emit server_stopped();
-		emit connection_list_changed();
 	}
+
+    emit server_stopped();
+    emit connection_list_changed();
 }
 
 

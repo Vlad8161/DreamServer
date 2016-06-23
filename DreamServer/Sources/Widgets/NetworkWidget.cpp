@@ -77,7 +77,7 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	m_action_server_stop->setCheckable(true);
 	m_action_server_stop->setChecked(true);
 
-	m_action_kick = new QAction(QString::fromLocal8Bit("Выгнать нахрен"), this);
+	m_action_kick = new QAction(QString::fromLocal8Bit("Выгнать"), this);
 
 	ui.connections_view->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_context_menu = new QMenu(this);
@@ -171,5 +171,5 @@ void NetworkWidget::on_action_kick()
 void NetworkWidget::on_context_menu_requested(const QPoint& pos)
 {
 	m_cursor_pos = pos;
-	m_context_menu->exec(mapToGlobal(pos));
+	m_context_menu->exec(ui.connections_view->mapToGlobal(pos));
 }
