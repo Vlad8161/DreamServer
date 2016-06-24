@@ -55,8 +55,10 @@ bool NetworkManager::start()
         return true;
     }
 
-	if (!m_tcp_server->listen(m_address, m_port))
+	if (!m_tcp_server->listen(m_address, m_port)) {
+		emit server_stopped();
 		return false;
+	}
 
 	emit server_started();
 	return true;
