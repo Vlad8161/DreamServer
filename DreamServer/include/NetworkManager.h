@@ -34,6 +34,7 @@ public:
 	bool start();
 	void stop();
 	void kick_client_at_row(int row);
+	void call_client_at_row(int row);
 
 private slots:
 	void on_connect();

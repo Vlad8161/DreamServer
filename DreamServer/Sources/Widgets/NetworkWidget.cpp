@@ -78,9 +78,11 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	m_action_server_stop->setChecked(true);
 
 	m_action_kick = new QAction(QString::fromLocal8Bit("Выгнать"), this);
+	m_action_call = new QAction(QString::fromLocal8Bit("Вызвать"), this);
 
 	ui.connections_view->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_context_menu = new QMenu(this);
+	m_context_menu->addAction(m_action_call);
 	m_context_menu->addAction(m_action_kick);
 
     connect(
@@ -92,6 +94,8 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 		this, SLOT(on_action_server_stop()));
 	connect(m_action_kick, SIGNAL(triggered(bool)),
 		this, SLOT(on_action_kick()));
+	connect(m_action_call, SIGNAL(triggered(bool)),
+		this, SLOT(on_action_call()));
 	connect(ui.connections_view, SIGNAL(customContextMenuRequested(const QPoint&)),
 		this, SLOT(on_context_menu_requested(const QPoint&)));
     connect(m_mgr, &NetworkManager::server_started,
@@ -164,6 +168,17 @@ void NetworkWidget::on_action_kick()
 		return;
 
 	m_mgr->kick_client_at_row(selected_rows[0].row());
+}
+
+
+
+void NetworkWidget::on_action_call()
+{
+	auto selected_rows = ui.connections_view->selectionModel()->selectedRows();
+	if (selected_rows.isEmpty())
+		return;
+
+	m_mgr->call_client_at_row(selected_rows[0].row());
 }
 
 

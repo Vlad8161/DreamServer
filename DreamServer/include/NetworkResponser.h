@@ -32,17 +32,19 @@ enum ResponseCodes {
 	ErrorAccessDeniedSync = 10,
 	IAmHere = 11,
 	Image = 12,
-	NoImage = 13
+	NoImage = 13,
+	Call = 14
 };
 
 
 
 
-/*Класс отвечает за обработку запросов клиента.
- *Для более быстрой работы содержимое меню кэшируется в виде
- *JSON объекта (m_cached_menu). Так же кэшируются изображения
- *каждого блюда в виде QByteArray и хэш меню. При обновлении меню
- *эти данные так же обновляются.
+/**
+ * Класс отвечает за обработку запросов клиента.
+ * Для более быстрой работы содержимое меню кэшируется в виде
+ * JSON объекта (m_cached_menu). Так же кэшируются изображения
+ * каждого блюда в виде QByteArray и хэш меню. При обновлении меню
+ * эти данные так же обновляются.
  */
 class NetworkResponser : public QObject
 {
@@ -59,6 +61,7 @@ public:
 	~NetworkResponser();
 	const QString& name() const { return m_name; }
 	void kick() { m_socket->disconnectFromHost(); }
+	void call();
 	void increment_ticks();
 
 public slots:

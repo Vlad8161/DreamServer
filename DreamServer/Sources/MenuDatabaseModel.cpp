@@ -146,9 +146,13 @@ void MenuDatabaseModel::remove_menu_item(const QModelIndex& index)
 
 
 
-bool MenuDatabaseModel::set_image(const QModelIndex& index, const QImage& img)
+bool MenuDatabaseModel::set_image(const QModelIndex& index, const QImage& img1)
 {
 	TreeNode* node = static_cast<TreeNode*>(index.internalPointer());
+
+	float width = 100;
+	float height = (float)img1.height() * (width / (float)img1.width());
+	QImage img = img1.scaled(QSize(width, height));
 
 	if (!m_menu_db.change_img(node->data->id, img))
 		return false;

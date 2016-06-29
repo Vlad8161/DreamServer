@@ -46,7 +46,7 @@ void NetworkResponser::on_ready_read()
 		// Это я писал бухой. Это плохо так не надо
 		// но оно работает так что похуй
 		if ((QTcpSocket*)m_socket == (QTcpSocket*)0xfeeefeee ||
-			(QTcpSocket*)m_socket == (QTcpSocket*)0x00000001)
+			(QTcpSocket*)m_socket < (QTcpSocket*)0x00100000)
 			return;
 
 		if (m_message_size == 0) {
@@ -312,7 +312,7 @@ void NetworkResponser::m_handle_image_request(const QJsonObject& root)
 	QBuffer buffer(&ba);
 	img.save(&buffer, "PNG");
 
-	if (ba.isEmpty() || ba.size() > 1000000) {
+	if (ba.isEmpty() || ba.size() > 100000000) {
 		response["response_code"] = ResponseCodes::NoImage;
 		response["image_id"] = id;
 		m_send_response(response);
@@ -349,4 +349,13 @@ void NetworkResponser::m_send_response(const QJsonObject& root, const QByteArray
 		response.append(appendix);
 	m_socket->write(response);
 	m_socket->flush();
+}
+
+
+
+void NetworkResponser::call()
+{
+	QJsonObject response;
+	response["response_code"] = ResponseCodes::Call;
+	m_send_response(response);
 }

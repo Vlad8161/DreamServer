@@ -229,8 +229,15 @@ void NetworkManager::on_responser_status_changed()
 void NetworkManager::kick_client_at_row(int row)
 {
 	auto c = clients();
+	if (row < c.size())
+		c[row]->kick();
+}
 
-	assert(row < c.size());
 
-	c[row]->kick();
+
+void NetworkManager::call_client_at_row(int row)
+{
+	auto c = clients();
+	if (row < c.size())
+		c[row]->call();
 }

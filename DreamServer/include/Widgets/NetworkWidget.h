@@ -21,6 +21,7 @@ public slots:
 	void on_action_server_start();
 	void on_action_server_stop();
 	void on_action_kick();
+	void on_action_call();
 	void on_context_menu_requested(const QPoint& pos);
     void on_combo_box_index_changed(const QString&);
     void on_server_started();
@@ -33,6 +34,7 @@ private:
 	QAction* m_action_server_start;
 	QAction* m_action_server_stop;
 	QAction* m_action_kick;
+	QAction* m_action_call;
 	QMenu* m_context_menu;
 	QPoint m_cursor_pos;
 };
