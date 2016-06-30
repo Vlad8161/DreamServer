@@ -4,6 +4,7 @@
 #include <qsqlrecord.h>
 #include <qmenu.h>
 #include <qfiledialog.h>
+#include <qsettings.h>
 #include <qmessagebox.h>
 #include <assert.h>
 
@@ -31,6 +32,7 @@ MenuWidget::MenuWidget(MenuDatabaseModel* menu, QWidget *parent)
 	m_item_menu = new QMenu();
 	m_item_menu->addAction(m_remove_item_action);
 	m_item_menu->addAction(m_change_img_action);
+	m_item_menu->addAction(m_remove_img_action);
 
 	m_tree_menu = new QMenu();
 	m_tree_menu->addAction(m_add_category_action);
@@ -77,7 +79,14 @@ void MenuWidget::create_actions()
 	m_change_img_action->setText(QString::fromLocal8Bit("Изменить изображение"));
 	connect(m_change_img_action, SIGNAL(triggered()),
 		this, SLOT(on_change_img_action()));
+
+	m_remove_img_action = new QAction(this);
+	m_remove_img_action->setText(QString::fromLocal8Bit("Удалить изображение"));
+	connect(m_remove_img_action, SIGNAL(triggered()),
+		this, SLOT(on_remove_img_action()));
 }
+
+
 
 
 
@@ -163,10 +172,20 @@ void MenuWidget::on_remove_item_action()
 
 void MenuWidget::on_change_img_action()
 {
-	QString img_name = QFileDialog::getOpenFileName(this,
-		QString::fromLocal8Bit("Выбор изображения"),
-		QDir::current().absolutePath(),
-		QString::fromLocal8Bit("Файлы изображений (*.png *.jpg *.jpeg *.bmp)"));
+    QSettings settings("dpiki", "dreamserver");
+    QString curr_dir = settings.value("MenuWidget/curr_dir", QVariant("C:\\")).toString();
+    QFileDialog dlg(this);
+    dlg.setNameFilter(QString::fromLocal8Bit("Файлы изображений (*.png *.jpg *.jpeg *.bmp)"));
+    dlg.setFileMode(QFileDialog::ExistingFile);
+    dlg.setWindowTitle(QString::fromLocal8Bit("Выбор изображения"));
+    dlg.setDirectory(curr_dir);
+
+    QString img_name;
+    if (dlg.exec()) {
+        img_name = dlg.selectedFiles().back();
+    }
+
+    settings.setValue("MenuWidget/curr_dir", dlg.directory().absolutePath());
 
 	QImage img(img_name);
 	if (img.isNull())
@@ -178,4 +197,16 @@ void MenuWidget::on_change_img_action()
 		return;
 
 	m_menu->set_image(selected_items.back(), img);
+}
+
+
+
+void MenuWidget::on_remove_img_action()
+{
+ 	auto selected_items = ui.tree_view->selectionModel()->selectedRows();
+
+	if (selected_items.size() == 0)
+		return;
+
+	m_menu->set_image(selected_items.back(), QImage());
 }

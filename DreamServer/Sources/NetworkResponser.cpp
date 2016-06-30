@@ -42,9 +42,6 @@ NetworkResponser::~NetworkResponser()
 void NetworkResponser::on_ready_read()
 {
 	while (true) {
-		// TODO:
-		// Это я писал бухой. Это плохо так не надо
-		// но оно работает так что похуй
 		if ((QTcpSocket*)m_socket == (QTcpSocket*)0xfeeefeee ||
 			(QTcpSocket*)m_socket < (QTcpSocket*)0x00100000)
 			return;

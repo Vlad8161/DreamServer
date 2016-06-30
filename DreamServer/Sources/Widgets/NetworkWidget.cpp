@@ -83,7 +83,7 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 	ui.connections_view->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_context_menu = new QMenu(this);
 	m_context_menu->addAction(m_action_call);
-	m_context_menu->addAction(m_action_kick);
+	//m_context_menu->addAction(m_action_kick);
 
     connect(
         ui.select_interface,
@@ -98,6 +98,8 @@ NetworkWidget::NetworkWidget(NetworkManager* network_manager, QWidget* parent) :
 		this, SLOT(on_action_call()));
 	connect(ui.connections_view, SIGNAL(customContextMenuRequested(const QPoint&)),
 		this, SLOT(on_context_menu_requested(const QPoint&)));
+    connect(ui.connections_view, &QAbstractItemView::doubleClicked,
+        this, &NetworkWidget::on_list_view_double_click);
     connect(m_mgr, &NetworkManager::server_started,
         this, &NetworkWidget::on_server_started);
     connect(m_mgr, &NetworkManager::server_stopped,
@@ -187,4 +189,11 @@ void NetworkWidget::on_context_menu_requested(const QPoint& pos)
 {
 	m_cursor_pos = pos;
 	m_context_menu->exec(ui.connections_view->mapToGlobal(pos));
+}
+
+
+
+void NetworkWidget::on_list_view_double_click(const QModelIndex& index)
+{
+    m_mgr->call_client_at_row(index.row());
 }
