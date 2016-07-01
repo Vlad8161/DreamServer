@@ -42,8 +42,9 @@ NetworkResponser::~NetworkResponser()
 void NetworkResponser::on_ready_read()
 {
 	while (true) {
-		if ((QTcpSocket*)m_socket == (QTcpSocket*)0xfeeefeee ||
-			(QTcpSocket*)m_socket < (QTcpSocket*)0x00100000)
+        if ((quint32)m_socket > (quint32)0x7FFF0000 ||
+            (QTcpSocket*)m_socket == (QTcpSocket*)0xfeeefeee ||
+			(QTcpSocket*)m_socket < (QTcpSocket*)0x00010000)
 			return;
 
 		if (m_message_size == 0) {
