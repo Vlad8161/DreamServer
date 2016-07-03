@@ -80,6 +80,9 @@
     <ClInclude Include="include\SettingsWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="include\Widgets\ClosedTableWidget.h">
@@ -305,10 +308,19 @@
     <Image Include="Resources\Icons\icon.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="C:\Users\User\Downloads\DreamIcon16.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon24.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon32.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon48.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MainSheet.css">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

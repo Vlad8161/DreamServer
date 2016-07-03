@@ -17,6 +17,7 @@
     <ClInclude Include="GeneratedFiles\ui_network_widget.h" />
     <ClInclude Include="include\MenuDatabase.h" />
     <ClInclude Include="include\MenuItem.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuild Include="include\OrdersRepoCache.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing OrdersRepoCache.h...</Message>
@@ -316,6 +317,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="C:\Users\User\Downloads\DreamIcon16.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon24.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon32.ico" />
+    <Image Include="C:\Users\User\Downloads\DreamIcon48.ico" />
     <Image Include="Resources\Icons\add_8214.png">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -362,6 +367,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>

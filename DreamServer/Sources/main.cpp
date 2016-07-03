@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
 	//qInstallMessageHandler(myMessageHandler);
 
+    QApplication::setWindowIcon(QIcon(":/Resources/Icons/DreamIcon.png"));
     s.connectToServer("dpiki_dreamserver");
     if (!s.waitForConnected(2)) {
         QFile css(":/MainSheet.css");
