@@ -174,7 +174,7 @@ void ServerSolution::on_tab_close_requested(int index)
 	if (!ok) {
 		if (QMessageBox::warning(this,
 			QString::fromLocal8Bit("Ошибка закрытия стола"),
-			QString::fromLocal8Bit("Невозможно закрыть стол №%1, так как он не обслужен!")
+			QString::fromLocal8Bit("Стол №%1 не обслужен. Все равно закрыть?")
 			.arg(t_num), QMessageBox::Yes, QMessageBox::No)
 			== QMessageBox::Yes) {
 			ok = true;
